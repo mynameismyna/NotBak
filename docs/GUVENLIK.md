@@ -39,4 +39,6 @@ Uygulama Next.js, React, Prisma, ldapjs, Nodemailer, ImapFlow ve SheetJS kullan�
 
 NSSM exe'si bu pakette yoktur.
 
-`public/` altındaki logo dosyalarının marka olarak dağıtılıp dağıtılamayacağı koddan anlaşılmaz. Herkese açık yayın öncesi sahip onayı gerekir. Onay yoksa logolar paketten çıkarılır.
+Kaynak MIT lisanslıdır. Telif sahibi Burak Türk'tür. Metin `LICENSE` dosyasındadır.
+
+Kurum logoları depoda yoktur. Giriş ekranı `public/company-logo.png` bekler. Bu dosyayı kuran kurum kendisi ekler ve dosya git'e girmez. NotBak logoları depoda kalır.

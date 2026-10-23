@@ -83,7 +83,7 @@ export default function LoginPage() {
         <div className="flex flex-col items-center gap-4 mb-6">
           <div className="relative w-[380px] h-[120px] flex items-center justify-center">
             <img
-              src="/logo.png"
+              src="/company-logo.png"
               alt="Şirket logosu"
               className="max-w-full max-h-full object-contain"
               onError={(e) => {

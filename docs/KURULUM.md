@@ -62,6 +62,10 @@ scripts\build-launcher.bat
 
 Windows hizmeti için NSSM (Non-Sucking Service Manager) isteğe bağlı harici araçtır. Bu pakette `nssm.exe` yoktur. Hizmet kurulumu bu kaynak yayınının parçası değildir.
 
+## Şirket logosu
+
+Giriş ekranı `public/company-logo.png` arar. Kuran kurum logosunu bu adla `public/` içine koyar. Dosya depoya girmez. Yoksa "Şirket logosu" yazısı görünür. Ayrıntı `public/SIRKET_LOGOSU.md`.
+
 ## Yapılmaması gerekenler
 
 - `.env`, `config/setup.json` ve `config/ldap.json` dosyalarını depoya eklemeyin.

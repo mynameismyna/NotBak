@@ -2,7 +2,7 @@
 
 Ekip görev, not ve fikir takibi. Kendi sunucunuzda çalışır. Kimlik doğrulama yerel parola veya LDAP / Active Directory ile yapılır. LDAP, dizin hizmetinde kullanıcı aramayı anlatan protokoldür. Active Directory, kurumlarda sık kullanılan dizin uygulamasıdır.
 
-Bu paket bir kaynak dağıtımıdır. Lisans seçilmemiştir. `package.json` içindeki `private: true` durur. Uzak depoya gönderme, sahip onayı olmadan yapılmaz.
+Kaynak kodu Burak Türk'e aittir ve MIT lisansı ile dağıtılır. Ayrıntı [LICENSE](LICENSE) dosyasındadır. `package.json` içindeki `private: true`, paketin npm kayıt defterine yanlışlıkla yayınlanmasını engeller. GitHub'da kaynak olarak durmasını engellemez.
 
 ## Bu sürümde kurulum
 
@@ -45,6 +45,14 @@ Görev, not ve fikir kayıtları; pano; projeler, birimler ve ekipler; bildiriml
 
 Kurumunuza ait dizin adresi, posta kutusu ve veritabanı bilgisi kaynakta yoktur. Bunları yalnızca kendi `.env` dosyanıza veya kurulum ekranına yazın. Bu dosyalar git'e girmez.
 
+## Şirket logosu
+
+Giriş ekranı `public/company-logo.png` dosyasını arar. Bu dosya depoda yoktur. Kuran kurum kendi logosunu bu adla `public/` klasörüne koyar. Dosya yoksa ekranda "Şirket logosu" yazısı görünür. Ayrıntı [public/SIRKET_LOGOSU.md](public/SIRKET_LOGOSU.md).
+
+NotBak işaretleri depoda kalır: `public/notbak_logo.png` ve `public/notbak_logo_old.png`.
+
 ## Lisans
 
-Lisans belirlenmedi. Bu kaynağın herkese açık dağıtımı, sahip onayı olmadan yapılmaz. Üçüncü taraf paketlerin lisansları kendi depolarındadır. SheetJS (`xlsx`) Apache-2.0 lisanslıdır ve kilit dosyasında bütünlük özeti ile sabitlenmiştir.
+MIT. İzin verici bir lisanstır: kodu kullanabilir, değiştirebilir ve kendi sunucunuzda, kurum içinde de çalıştırabilirsiniz. Dağıtırken lisans metnini ve telif satırını korursunuz. GPL veya AGPL gibi türevleri açığa çıkarma zorunluluğu yoktur. Kurum içi kurulum için bu yüzden MIT seçildi.
+
+Üçüncü taraf paketlerin lisansları kendilerine aittir. SheetJS (`xlsx`) Apache-2.0 lisanslıdır ve kilit dosyasında bütünlük özeti ile sabitlenmiştir.

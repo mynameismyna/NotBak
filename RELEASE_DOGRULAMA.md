@@ -43,11 +43,13 @@ ESLint 9, Next.js 16 düz yapılandırmasının eş bağımlılığıdır. `next
 - `src/proxy.ts` çerez imzasını doğrulamaz.
 - Kurulum bekçisi, kurulum bittikten sonra çerezdeki role güvenir.
 - IMAP parolası veritabanında düz metin JSON olarak durur. LDAP bind parolası `config/ldap.json` içinde düz metin durur. Bu dosya git dışındadır.
-- Logo dosyalarının marka dağıtım hakkı koddan anlaşılmaz.
-- Lisans seçilmedi. `private: true` durur.
+- Kaynak MIT lisanslıdır. Telif sahibi Burak Türk'tür. Metin `LICENSE` dosyasındadır.
+- Kurum logoları depodan çıkarıldı. Giriş ekranı `public/company-logo.png` bekler. Bu dosya git'e girmez.
 
 ## Sonuç
 
-Kaynak adayı yerel git geçmişine alınabilir. Herkese açık veya uzak yayın **NO-GO**. Sahip, lisans ve logo onayı vermeden push yapılmaz.
+Sahip, kaynağın kendisine ait olduğunu ve açık kaynak lisansını onayladı. Lisans MIT oldu. Kurum logoları paketten alındı. `private: true` npm kayıt defterine yanlışlıkla yayınlamayı engeller.
+
+Uzak depoya bu adımda gönderilmedi. Push, `NotBak-release` klasöründen yapılmalıdır. Kirli hazırlık kopyası gönderilmez.
 
 Bu makinede kayıtlı bir Git kimliği yoktur. İlk commit, kalıcı `git config` değiştirilmeden tek seferlik bir yer tutucu yazar ile oluşturulmuştur. Yazar adı depoya yazılan bir kişi kimliği değildir.

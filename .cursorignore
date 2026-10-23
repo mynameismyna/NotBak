@@ -13,3 +13,8 @@ launcher-build/
 *.exe
 *.log
 *.pem
+public/company-logo.png
+public/company-logo.svg
+public/company-logo.webp
+public/company-logo.jpg
+public/company-logo.jpeg

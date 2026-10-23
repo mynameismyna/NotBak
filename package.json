@@ -2,6 +2,7 @@
   "name": "notbak",
   "version": "1.0.0",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "dev": "next dev --webpack",
     "dev:debug": "node --inspect node_modules/next/dist/bin/next dev --webpack",
