@@ -1,0 +1,282 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+}
+
+model User {
+  id                        String                  @id @default(cuid())
+  email                     String                  @unique
+  displayName               String
+  passwordHash              String?
+  ldapDn                    String?
+  source                    String?                 @default("MANUAL") @db.NVarChar(20)
+  isActive                  Boolean                 @default(false)
+  isAdmin                   Boolean                 @default(false)
+  globalRole                String?                 @db.NVarChar(20)
+  assistantUserId           String?
+  lastSyncAt                DateTime?
+  dailyDigestEnabled        Boolean                 @default(true)
+  dailyDigestTime           String?                 @db.NVarChar(5)
+  lastDigestSentAt          DateTime?
+  createdAt                 DateTime                @default(now())
+  mustChangePassword        Boolean                 @default(false)
+  comments                  Comment[]
+  importAssignments         ImportPendingApproval[] @relation("importAssignee")
+  importRequests            ImportPendingApproval[] @relation("importRequester")
+  inboundEmails             InboundEmailRecord[]
+  notifications             Notification[]
+  problemReports            ProblemReport[]
+  ownedProjects             Project[]               @relation("projectOwner")
+  delegatedProjects         ProjectDelegate[]       @relation("delegateUser")
+  sentJoinRequests          ProjectJoinRequest[]    @relation("joinRequester")
+  projectMemberships        ProjectMember[]
+  tasks                     Task[]                  @relation("assignee")
+  createdTasks              Task[]                  @relation("creator")
+  taskAssignmentHistoryFrom TaskAssignmentHistory[] @relation("taskAssignmentFrom")
+  taskAssignmentHistoryTo   TaskAssignmentHistory[] @relation("taskAssignmentTo")
+  taskCollaborations        TaskCollaborator[]
+  teamMemberships           TeamMember[]
+  unitMemberships           UnitMember[]
+  assistant                 User?                   @relation("assistantRelation", fields: [assistantUserId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  assistedUsers             User[]                  @relation("assistantRelation")
+}
+
+model Unit {
+  id        String       @id @default(cuid())
+  name      String
+  createdAt DateTime     @default(now())
+  projects  Project[]
+  members   UnitMember[]
+}
+
+model UnitMember {
+  id     BigInt @id @default(autoincrement())
+  unitId String
+  userId String
+  role   String @db.NVarChar(30)
+  unit   Unit   @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onUpdate: NoAction)
+
+  @@unique([unitId, userId])
+}
+
+model Project {
+  id                     String                  @id @default(cuid())
+  name                   String
+  iconKey                String                  @default("folder") @db.NVarChar(40)
+  unitId                 String?
+  ownerId                String?
+  visibility             String                  @default("MEMBERS_ONLY") @db.NVarChar(20)
+  allowAnyoneToAddTasks  Boolean                 @default(false)
+  importPendingApprovals ImportPendingApproval[]
+  owner                  User?                   @relation("projectOwner", fields: [ownerId], references: [id])
+  unit                   Unit?                   @relation(fields: [unitId], references: [id])
+  delegates              ProjectDelegate[]
+  joinRequests           ProjectJoinRequest[]
+  members                ProjectMember[]
+  tasks                  Task[]
+  teams                  Team[]
+
+  @@index([ownerId], map: "IX_Project_ownerId")
+  @@index([unitId], map: "IX_Project_unitId")
+}
+
+model ProjectMember {
+  projectId String
+  userId    String
+  role      String  @default("EKIP_UYESI") @db.NVarChar(30)
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User    @relation(fields: [userId], references: [id], onUpdate: NoAction)
+
+  @@id([projectId, userId])
+  @@index([userId], map: "IX_ProjectMember_userId")
+}
+
+model ProjectDelegate {
+  id                      BigInt    @id @default(autoincrement())
+  projectId               String
+  delegateUserId          String
+  permission              String    @db.NVarChar(20)
+  fullPermissionExpiresAt DateTime?
+  delegateUser            User      @relation("delegateUser", fields: [delegateUserId], references: [id], onUpdate: NoAction)
+  project                 Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, delegateUserId])
+}
+
+model Team {
+  id        String       @id @default(cuid())
+  name      String
+  projectId String
+  createdAt DateTime     @default(now())
+  project   Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  members   TeamMember[]
+}
+
+model TeamMember {
+  id     BigInt @id @default(autoincrement())
+  teamId String
+  userId String
+  role   String @db.NVarChar(30)
+  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onUpdate: NoAction)
+
+  @@unique([teamId, userId])
+  @@index([userId], map: "IX_TeamMember_userId")
+}
+
+model Task {
+  id                String                  @id @default(cuid())
+  title             String                  @db.NVarChar(Max)
+  description       String                  @db.NVarChar(Max)
+  type              String                  @db.NVarChar(20)
+  status            String                  @db.NVarChar(20)
+  priority          String                  @db.NVarChar(20)
+  priorityRank      Int                     @default(0)
+  dueDate           DateTime
+  assigneeId        String
+  projectId         String?
+  isPrivate         Boolean                 @default(false)
+  statusChangedAt   DateTime?
+  startedAt         DateTime?
+  completedAt       DateTime?
+  createdAt         DateTime                @default(now())
+  updatedAt         DateTime                @updatedAt
+  createdById       String?
+  rejectionReason   String?                 @db.NVarChar(2000)
+  comments          Comment[]
+  assignee          User                    @relation("assignee", fields: [assigneeId], references: [id], onUpdate: NoAction)
+  createdBy         User?                   @relation("creator", fields: [createdById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  project           Project?                @relation(fields: [projectId], references: [id])
+  assignmentHistory TaskAssignmentHistory[]
+  collaborators     TaskCollaborator[]
+
+  @@index([dueDate, priorityRank(sort: Desc), createdAt(sort: Desc)], map: "IX_Task_dueDate_priorityRank_createdAt")
+  @@index([assigneeId, status], map: "IX_Task_assigneeId_status")
+  @@index([projectId, status], map: "IX_Task_projectId_status")
+  @@index([createdById], map: "IX_Task_createdById")
+  @@index([type, status], map: "IX_Task_type_status")
+  @@index([status, completedAt], map: "IX_Task_status_completedAt")
+  @@index([updatedAt(sort: Desc)], map: "IX_Task_updatedAt")
+  @@index([isPrivate, assigneeId], map: "IX_Task_isPrivate_assigneeId")
+}
+
+model TaskCollaborator {
+  taskId     String
+  userId     String
+  permission String @default("READ_ONLY") @db.NVarChar(20)
+  task       Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user       User   @relation(fields: [userId], references: [id], onUpdate: NoAction)
+
+  @@id([taskId, userId])
+  @@index([userId], map: "IX_TaskCollaborator_userId")
+}
+
+model Comment {
+  id                    String                 @id @default(cuid())
+  content               String                 @db.NVarChar(Max)
+  taskId                String
+  authorId              String
+  createdAt             DateTime               @default(now())
+  author                User                   @relation(fields: [authorId], references: [id], onUpdate: NoAction)
+  task                  Task                   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskAssignmentHistory TaskAssignmentHistory?
+}
+
+model TaskAssignmentHistory {
+  id         String   @id @default(cuid())
+  taskId     String
+  fromUserId String
+  toUserId   String
+  commentId  String?  @unique
+  createdAt  DateTime @default(now())
+  comment    Comment? @relation(fields: [commentId], references: [id], onUpdate: NoAction)
+  fromUser   User     @relation("taskAssignmentFrom", fields: [fromUserId], references: [id], onUpdate: NoAction)
+  task       Task     @relation(fields: [taskId], references: [id], onUpdate: NoAction)
+  toUser     User     @relation("taskAssignmentTo", fields: [toUserId], references: [id], onUpdate: NoAction)
+
+  @@index([taskId])
+}
+
+model ProblemReport {
+  id          String   @id @default(cuid())
+  subject     String   @db.NVarChar(Max)
+  description String   @db.NVarChar(Max)
+  reporterId  String
+  createdAt   DateTime @default(now())
+  reporter    User     @relation(fields: [reporterId], references: [id], onUpdate: NoAction)
+}
+
+model Notification {
+  id                          String    @id @default(cuid())
+  userId                      String
+  type                        String    @db.NVarChar(30)
+  title                       String
+  body                        String?   @db.NVarChar(500)
+  link                        String?   @db.NVarChar(500)
+  relatedTaskId               String?
+  relatedImportApprovalId     String?
+  relatedProjectJoinRequestId String?
+  readAt                      DateTime?
+  createdAt                   DateTime  @default(now())
+  user                        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt], map: "IX_Notification_userId_readAt")
+}
+
+model ImportPendingApproval {
+  id          String    @id @default(cuid())
+  projectId   String
+  requesterId String
+  assigneeId  String
+  items       String
+  status      String    @default("PENDING") @db.NVarChar(20)
+  createdAt   DateTime  @default(now())
+  resolvedAt  DateTime?
+  assignee    User      @relation("importAssignee", fields: [assigneeId], references: [id], onUpdate: NoAction)
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  requester   User      @relation("importRequester", fields: [requesterId], references: [id], onUpdate: NoAction)
+
+  @@index([requesterId, status], map: "IX_ImportPendingApproval_requesterId_status")
+  @@index([assigneeId, status], map: "IX_ImportPendingApproval_assigneeId_status")
+  @@index([projectId, status], map: "IX_ImportPendingApproval_projectId_status")
+}
+
+model ProjectJoinRequest {
+  id          String    @id @default(cuid())
+  projectId   String
+  requesterId String
+  status      String    @default("PENDING") @db.NVarChar(20)
+  createdAt   DateTime  @default(now())
+  resolvedAt  DateTime?
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  requester   User      @relation("joinRequester", fields: [requesterId], references: [id], onUpdate: NoAction)
+
+  @@index([requesterId, status], map: "IX_ProjectJoinRequest_requesterId_status")
+  @@index([projectId, status], map: "IX_ProjectJoinRequest_projectId_status")
+}
+
+model InboundEmailRecord {
+  id              String   @id @default(cuid())
+  fromEmail       String   @db.NVarChar(320)
+  userId          String?
+  subject         String
+  bodyText        String?  @db.NVarChar(Max)
+  bodyHtml        String?  @db.NVarChar(Max)
+  messageId       String?  @unique @db.NVarChar(500)
+  status          String   @default("PENDING") @db.NVarChar(20)
+  convertedTaskId String?
+  receivedAt      DateTime @default(now())
+  user            User?    @relation(fields: [userId], references: [id])
+
+  @@index([userId, status], map: "IX_InboundEmailRecord_userId_status")
+}
+
+model AppSetting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+}

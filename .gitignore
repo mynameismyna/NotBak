@@ -1,0 +1,47 @@
+# bağımlılıklar
+/node_modules
+/.pnp
+.pnp.js
+
+# test
+/coverage
+
+# Next.js
+/.next/
+/out/
+/build
+
+# ortam ve sırlar
+.env
+.env.*
+!.env.example
+!.env.development.example
+*.pem
+
+# yerel yapılandırma
+config/setup.json
+config/ldap.json
+config/*.txt
+!config/*.example
+
+# günlük, derleme, üretilmiş istemci
+logs/
+launcher-build/
+generated/
+*.tsbuildinfo
+*.log
+*.exe
+*.exe.old
+
+# başlatıcı derleme çıktısı
+tools/NotBakLauncher/bin/
+tools/NotBakLauncher/obj/
+tools/nssm/
+
+# canlı yama SQL'leri bu kaynak paketinin kurulum yolu değildir
+prisma/migrations/
+
+# diğer
+.DS_Store
+.vercel
+next-env.d.ts
